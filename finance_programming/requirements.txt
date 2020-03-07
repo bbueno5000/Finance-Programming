@@ -12,6 +12,7 @@ lazy-object-proxy==1.4.3
 lxml==4.5.0
 matplotlib==3.2.0
 mccabe==0.6.1
+mplfinance==0.12.3a3
 numpy==1.18.1
 pandas==1.0.1
 pandas-datareader==0.8.1
