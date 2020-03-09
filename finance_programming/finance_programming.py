@@ -1,6 +1,7 @@
 """
 DOCSTRING
 """
+import bs4
 import datetime
 import matplotlib.dates as mdates
 import matplotlib.pyplot as pyplot
@@ -8,6 +9,8 @@ import matplotlib.style as style
 import mplfinance.original_flavor as mplfinance
 import pandas
 import pandas_datareader.data as web
+import pickle
+import requests
 
 style.use('ggplot')
 
@@ -44,5 +47,19 @@ def manipulate_data():
     axis_2.fill_between(dataframe_c.index.map(mdates.date2num), dataframe_c.values, 0)
     pyplot.show()
 
+def save_sp500_tickers():
+    """
+    DOCSTRING
+    """
+    response = requests.get('https://en.wikipedia.org/wiki/S%26P_500_Index')
+    soup = bs4.BeautifulSoup(response.text, 'lxml')
+    table = soup.find('table', {'class': 'wikitable sortable'})
+    tickers = []
+    for row in table.findAll('tr')[1:]:
+        tickers.append(row.findAll('td')[0].text)
+    with open('sp500_tickers.pkl', 'wb') as file:
+        pickle.dump(tickers, file)
+    return tickers
+
 if __name__ == '__main__':
-    manipulate_data()
+    save_sp500_tickers()

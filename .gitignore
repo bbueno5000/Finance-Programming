@@ -260,3 +260,4 @@ paket-files/
 __pycache__/
 *.pyc
 /finance_programming/google.csv
+/finance_programming/sp500_tickers.pkl
