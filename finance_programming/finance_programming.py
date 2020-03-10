@@ -15,6 +15,27 @@ import requests
 
 style.use('ggplot')
 
+def consolidate_data():
+    """
+    DOCSTRING
+    """
+    with open('sp500_tickers.pkl', 'rb') as file:
+        tickers = pickle.load(file)
+    dataframe_a = pandas.DataFrame()
+    tickers = tickers[:10]
+    for count, ticker in enumerate(tickers):
+        ticker = ticker.strip()
+        dataframe_b = pandas.read_csv(os.path.join('stock_dataframes', ticker + '.csv'))
+        dataframe_b.set_index('Date', inplace=True)
+        dataframe_b.rename(columns={'Adj Close': ticker}, inplace=True)
+        dataframe_b.drop(['Open', 'High', 'Low', 'Close', 'Volume'], 1, inplace=True)
+        if dataframe_a.empty:
+            dataframe_a = dataframe_b
+        else:
+            dataframe_a = dataframe_a.join(dataframe_b, how='outer')
+        print(count)
+    dataframe_a.to_csv('sp500_closes.csv')
+
 def get_data():
     """
     DOCSTRING
@@ -38,10 +59,11 @@ def get_data_from_yahoo(reload_sp500=False):
     start = datetime.datetime(2000, 1, 1)
     end = datetime.datetime(2016, 12, 31)
     for ticker in tickers[:10]:
+        ticker = ticker.strip()
         print(ticker)
         if not os.path.exists('stock_dataframes/{}.csv'.format(ticker)):
             dataframe_a = web.DataReader(ticker, 'yahoo', start, end)
-            dataframe_a.to_csv('stock_dataframes/{}.csv'.format(ticker))
+            dataframe_a.to_csv(os.path.join('stock_dataframes', ticker + '.csv'))
         else:
             print('{} already exists'.format(ticker))
 
@@ -73,7 +95,7 @@ def save_sp500_tickers():
     """
     DOCSTRING
     """
-    response = requests.get('https://en.wikipedia.org/wiki/S%26P_500_Index')
+    response = requests.get('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
     soup = bs4.BeautifulSoup(response.text, 'lxml')
     table = soup.find('table', {'class': 'wikitable sortable'})
     tickers = []
@@ -84,4 +106,4 @@ def save_sp500_tickers():
     return tickers
 
 if __name__ == '__main__':
-    get_data_from_yahoo()
+    consolidate_data()
