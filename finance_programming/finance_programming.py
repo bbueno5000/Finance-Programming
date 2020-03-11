@@ -1,20 +1,35 @@
 """
 DOCSTRING
 """
-import bs4
+# standard
 import datetime
+import os
+import pickle
+# non-standard
+import bs4
 import matplotlib.dates as mdates
 import matplotlib.pyplot as pyplot
 import matplotlib.style as style
 import mplfinance.original_flavor as mplfinance
 import numpy
-import os
 import pandas
 import pandas_datareader.data as web
-import pickle
 import requests
 
 style.use('ggplot')
+
+def buy_sell_hold(*args):
+    """
+    DOCSTRING
+    """
+    columns = [c for c in args]
+    requirement = 0.02
+    for column in columns:
+        if column > requirement:
+            return 1
+        if column < -requirement:
+            return -1
+    return 0
 
 def consolidate_data():
     """
