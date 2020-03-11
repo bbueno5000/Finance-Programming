@@ -92,6 +92,20 @@ def manipulate_data():
     axis_2.fill_between(dataframe_c.index.map(mdates.date2num), dataframe_c.values, 0)
     pyplot.show()
 
+def process_label_data(ticker):
+    """
+    DOCSTRING
+    """
+    days = 7
+    dataframe_a = pandas.read_csv('sp500_closes.csv', index_col=0)
+    tickers = dataframe_a.columns.values.to_list()
+    dataframe_a.fillna(0, inplace=0)
+    for i in range(1, days+1):
+        dataframe_a['{}_{}d'.format(ticker, i)] = (
+            (dataframe_a[ticker].shift(-i)-dataframe_a[ticker])/dataframe_a[ticker])
+    dataframe_a.fillna(0, inplace=0)
+    return tickers, dataframe_a
+
 def save_sp500_tickers():
     """
     DOCSTRING
