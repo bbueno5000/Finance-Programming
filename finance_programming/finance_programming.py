@@ -7,6 +7,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as pyplot
 import matplotlib.style as style
 import mplfinance.original_flavor as mplfinance
+import numpy
 import os
 import pandas
 import pandas_datareader.data as web
@@ -105,5 +106,29 @@ def save_sp500_tickers():
         pickle.dump(tickers, file_a)
     return tickers
 
+def visualize_data():
+    """
+    DOCSTRING
+    """
+    dataframe_a = pandas.read_csv('sp500_closes.csv')
+    dataframe_b = dataframe_a.corr()
+    data = dataframe_b.values
+    figure = pyplot.figure()
+    axis_1 = figure.add_subplot(1, 1, 1)
+    heatmap = axis_1.pcolor(data, cmap=pyplot.cm.get_cmap('RdYlGn'))
+    figure.colorbar(heatmap)
+    axis_1.set_xticks(numpy.arange(data.shape[0])+0.5, minor=False)
+    axis_1.set_yticks(numpy.arange(data.shape[1])+0.5, minor=False)
+    axis_1.invert_yaxis()
+    axis_1.xaxis.tick_top()
+    column_labels = dataframe_b.columns
+    row_labels = dataframe_b.index
+    axis_1.set_xticklabels(column_labels)
+    axis_1.set_yticklabels(row_labels)
+    heatmap.set_clim(-1, 1)
+    pyplot.xticks(rotation=90)
+    pyplot.tight_layout()
+    pyplot.show()
+
 if __name__ == '__main__':
-    consolidate_data()
+    visualize_data()
