@@ -2,6 +2,7 @@
 DOCSTRING
 """
 # standard
+import collections
 import datetime
 import os
 import pickle
@@ -51,6 +52,32 @@ def consolidate_data():
             dataframe_a = dataframe_a.join(dataframe_b, how='outer')
         print(count)
     dataframe_a.to_csv('sp500_closes.csv')
+
+def extract_features(ticker):
+    """
+    DOCSTRING
+    """
+    tickers, dataframe_a = process_label_data(ticker)
+    dataframe_a['{}_target'.format(ticker)] = list(map(buy_sell_hold,
+                                                       dataframe_a['{}_1d'.format(ticker)],
+                                                       dataframe_a['{}_2d'.format(ticker)],
+                                                       dataframe_a['{}_3d'.format(ticker)],
+                                                       dataframe_a['{}_4d'.format(ticker)],
+                                                       dataframe_a['{}_5d'.format(ticker)],
+                                                       dataframe_a['{}_6d'.format(ticker)],
+                                                       dataframe_a['{}_7d'.format(ticker)]))
+    values = dataframe_a['{}_target'.format(ticker)].values
+    string_values = [str(i) for i in values]
+    print('Data Spread:', collections.Counter(string_values))
+    dataframe_a.fillna(0, inplace=True)
+    dataframe_a.replace([numpy.inf, -numpy.inf], numpy.nan)
+    dataframe_a.dropna(inplace=True)
+    dataframe_b = dataframe_a[[t for t in tickers]].pct_change()
+    dataframe_b = dataframe_b.replace([numpy.inf, -numpy.inf], 0)
+    dataframe_a.fillna(0, inplace=True)
+    features = dataframe_b.values
+    labels = dataframe_a['{}_target'.format(ticker)].values
+    return features, labels, dataframe_a
 
 def get_data():
     """
@@ -113,12 +140,12 @@ def process_label_data(ticker):
     """
     days = 7
     dataframe_a = pandas.read_csv('sp500_closes.csv', index_col=0)
-    tickers = dataframe_a.columns.values.to_list()
-    dataframe_a.fillna(0, inplace=0)
+    tickers = dataframe_a.columns.values
+    dataframe_a.fillna(0, inplace=True)
     for i in range(1, days+1):
         dataframe_a['{}_{}d'.format(ticker, i)] = (
             (dataframe_a[ticker].shift(-i)-dataframe_a[ticker])/dataframe_a[ticker])
-    dataframe_a.fillna(0, inplace=0)
+    dataframe_a.fillna(0, inplace=True)
     return tickers, dataframe_a
 
 def save_sp500_tickers():
@@ -160,4 +187,4 @@ def visualize_data():
     pyplot.show()
 
 if __name__ == '__main__':
-    visualize_data()
+    extract_features('AAP')
