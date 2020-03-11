@@ -261,3 +261,5 @@ __pycache__/
 *.pyc
 /finance_programming/google.csv
 /finance_programming/sp500_tickers.pkl
+/finance_programming/sp500_closes.csv
+/finance_programming/stock_dataframes

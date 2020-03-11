@@ -16,6 +16,10 @@ import numpy
 import pandas
 import pandas_datareader.data as web
 import requests
+import sklearn.ensemble as ensemble
+import sklearn.neighbors as neighbors
+import sklearn.svm as svm
+import sklearn.model_selection as model_selection
 
 style.use('ggplot')
 
@@ -118,6 +122,24 @@ def graph_data():
     dataframe_a.plot()
     pyplot.show()
 
+def machine_learning(ticker):
+    """
+    DOCSTRING
+    """
+    features, labels, _ = extract_features(ticker)
+    features_train, features_test, labels_train, labels_test = \
+        model_selection.train_test_split(features, labels, test_size=0.25)
+    classifier_a = ensemble.VotingClassifier(
+        [('Linear_SVC', svm.LinearSVC()),
+         ('K_Neighbors', neighbors.KNeighborsClassifier()),
+         ('Random_Forest', ensemble.RandomForestClassifier())])
+    classifier_a.fit(features_train, labels_train)
+    accuracy = classifier_a.score(features_test, labels_test)
+    predictions = classifier_a.predict(features_test)
+    print('Accuracy:', accuracy)
+    print('Prediction Spread:', collections.Counter(predictions))
+    return accuracy
+
 def manipulate_data():
     """
     DOCSTRING
@@ -187,4 +209,4 @@ def visualize_data():
     pyplot.show()
 
 if __name__ == '__main__':
-    extract_features('AAP')
+    machine_learning('AAP')
