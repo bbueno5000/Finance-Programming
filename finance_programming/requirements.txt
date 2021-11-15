@@ -16,7 +16,7 @@ mplfinance==0.12.3a3
 numpy==1.18.1
 pandas==1.0.1
 pandas-datareader==0.8.1
-pip==20.0.2
+pip==21.1
 pylint==2.4.4
 pyparsing==2.4.6
 python-dateutil==2.8.1
